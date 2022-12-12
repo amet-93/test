@@ -209,56 +209,64 @@ let arr = [
   }
 ];
 
-let grouped = groupArray(arr);
+  //NAME
+const nameJoin = (obj) => {
+  return `${obj.first} ${obj.last}`;
+};
 
-function calculateMarks (marks){
- let total = 0;
- for (let i of marks){
- 	total = total + i.marks
- }
- return total;
-}
+// MARKS
+const calMarks = (arr) => {
+  let total = 0;
+  for (let i of arr) {
+    total = total + i.marks;
+  }
+  return total;
+};
+const group = (data) => {
+  const modData = data.map((item) => {
+    const title = nameJoin(item.name);
+    const totalMarks = calMarks(item.marks);
 
-    
-/* var result = Object.keys(grouped).map((key) => [key, grouped[key]]); */
-// console.log(grouped);
-// console.log(grouped)
-// for(let val in grouped){
-//   //console.log(val)
-// console.log(grouped[val].sort((a,b)=>{
-//   if(a.total < b.total){
-//     return a
-//   }
-// return b
-// }))
-// }
+    return { ...item, title, totalMarks };
+  });
 
-// console.log(grouped.sort(function(a, b){
-//     return a[0].Number(totalMarks).localeCompare(b[0].Number(totalMarks));
-//   // console.log(grouped);
-// }));
+  const top = modData.reduce((data, item) => {
+    data.push(`${item.title} from ${item.class} obtained ${item.totalMarks}`);
+    return data;
+  }, []);
 
-console.log(grouped);
-
-function groupArray(myArray) {
-    let grouped = [];
-
-    for (let i = 0; i < myArray.length; i++) {
-        let row = myArray[i];
-        let group = grouped[row.class];
-        if (!group) {
-            group = [];
-            grouped[row.class] = group;
-        }
-        const totalMarks  = calculateMarks(row.marks)
-        // row.name = row.class
-        row.totalMarks = totalMarks
-        row.title = row.name['first']+ " " +row.name['last']
-        // group.push({...row,totalMarks})
-        group.push(row);
-      
+  const records = modData.reduce((arr, item) => {
+    let index = arr.findIndex((i) => i.name === item.class);
+    if (index + 1) { //findIndex gives 0 on first index so i am adding + 1
+      //push
+      arr[index].students.push(item);
+    } else {
+      //create
+      arr.push({ name: item.class, students: [item] });
     }
-    return grouped;
-}
+
+    return arr;
+  }, []);
+
+ // sort marks
+  for (let r of records) {
+    r.students = r.students.sort((a, b) => b.totalMarks - a.totalMarks);
+  }
+
+  // sort top
+  const sortedTop = top.sort((a, b) => {
+    const aTemp = a.split(" ");
+    const bTemp = b.split(" ");
+    return bTemp[bTemp.length - 1] - aTemp[aTemp.length - 1];
+  });
+
+  return {
+    records,
+    top: sortedTop,
+  };
+};
+
+const res = group(input);
+console.log(res);
 
 
