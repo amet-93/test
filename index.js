@@ -1,4 +1,4 @@
-let arr = [
+let input = [
   {
     "name": {
       "first": "John",
